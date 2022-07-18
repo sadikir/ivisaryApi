@@ -28,7 +28,7 @@ const ProfileSchema = new mongoose.Schema({
     required:false,
   },
   income:{
-    type: Number,
+    type: String,
     required:false
   },
   employer:{
@@ -54,7 +54,7 @@ const ProfileSchema = new mongoose.Schema({
   relatives:[{
     name:String,
     country:String,
-    age:Number
+    age:String
   }]
 },
 {timestamps:true}

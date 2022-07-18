@@ -1,7 +1,13 @@
 const User = require("../models/Profile.js")
-const router = require('express').Router();
-const bcrypt=require("bcrypt");
 
+const bcrypt=require("bcrypt");
+const router = require('express').Router();
+
+router.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "https://ivisary.sadikirungo.repl.co"); // update to match the domain you will make the request from
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 
 router.post("/register", async(req, res)=>{
@@ -17,10 +23,7 @@ router.post("/register", async(req, res)=>{
       phone:req.body.phone,
       income:req.body.income,
       employer:req.body.employer,
-      frontID:req.body.frontID,
-      backID:req.body.backID,
-      selfiePhoto:req.body.selfie,
-      incomeDoc:req.body.incomeDoc,
+      
       relatives:req.body.relatives
       
     });
@@ -29,7 +32,7 @@ router.post("/register", async(req, res)=>{
     res.status(200).json(others);
   }catch(err){
     
-    res.status(500).json("there was an error")
+    res.status(500).json(err)
   }
 })
 router.post("/login", async (req, res)=>{
