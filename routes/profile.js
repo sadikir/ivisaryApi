@@ -2,6 +2,7 @@ const router = require("express").Router();
 const User = require("../models/Profile.js")
 const bcrypt=require("bcrypt");
 
+
 router.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "https://ivisary.sadikirungo.repl.co"); // update to match the domain you will make the request from
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");

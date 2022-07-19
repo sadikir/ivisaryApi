@@ -55,7 +55,11 @@ const ProfileSchema = new mongoose.Schema({
     name:String,
     country:String,
     age:String
-  }]
+  }],
+  isVerified:{
+    type:Boolean,
+    default:false, 
+  }
 },
 {timestamps:true}
 )
