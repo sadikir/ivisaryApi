@@ -27,11 +27,19 @@ const ProfileSchema = new mongoose.Schema({
     type:String,
     required:false,
   },
+  price:{
+    type:Number,
+    required:false,
+  },
   income:{
     type: String,
     required:false
   },
   employer:{
+    type:String,
+    required:false
+  },
+  address:{
     type:String,
     required:false
   },

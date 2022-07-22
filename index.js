@@ -5,6 +5,7 @@ const mongoose = require("mongoose")
 const authRoute = require("./routes/auth.js")
 const multer = require("multer")
 const profileRoute = require("./routes/profile")
+const paymentRoute = require("./routes/payment.js")
 const cors = require("cors")
 app.use("/files", express.static(path.join(__dirname, "/files")));
 app.use(cors({origin: true, credentials: true}));
@@ -47,5 +48,6 @@ app.post("/api/upload", upload.single("file"), (req, res)=>{
 
 app.use("/api/auth", authRoute)
 app.use("/api/profile", profileRoute);
+app.use("/api/payment", paymentRoute);
 
 
