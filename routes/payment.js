@@ -8,6 +8,7 @@ router.use(function(req, res, next) {
   next();
 });
 router.post("/payment_session", async (req, res)=>{
+  const userId=req.body.registeredUser
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -24,7 +25,7 @@ router.post("/payment_session", async (req, res)=>{
              :null,
       },
      ],
-      success_url: `https://ivisary.sadikirungo.repl.co/login`,
+      success_url: `https://ivisary.sadikirungo.repl.co/registeruser/${userId}`,
       cancel_url: `https://ivisary.sadikirungo.repl.co/about/#pricing`,
     })
     // const invoice = await stripe.invoices.search({

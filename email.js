@@ -1,7 +1,42 @@
+
 // using Twilio SendGrid's v3 Node.js Library
 // https://github.com/sendgrid/sendgrid-nodejs
+const PaidUser = require("./models/PaidUser.js")
+const bcrypt = require("bcrypt")
+const Token = require("./models/VerificationToken.js")
 
-const sendEmail = (token,userEmail)=>{
+
+const sendEmail = async(userEmail)=>{
+  //generate token
+//generate token
+let OTP ="";
+    const generateToken=()=>{
+     
+      for(let i=0;i<=10; i++){
+        const randVal= Math.round(Math.random() * 9);
+        OTP=OTP+randVal
+      }
+      return OTP;
+    }
+    //hash the new genrated token
+    const salt2 = await bcrypt.genSalt(10);
+    const newToken = generateToken()
+    const hashedToken= await bcrypt.hash(newToken ,salt2);
+    
+    //create and save a new token
+     const User=await PaidUser.findOne({email:userEmail})
+    const createTokenDoc = new Token({
+      owner:User._id,
+      tokenCode:hashedToken
+    })
+    //send the token email to the user
+    
+    //save both the user and the token
+    const saveToken = await createTokenDoc.save();
+    
+
+
+  
    const sgMail = require('@sendgrid/mail')
    sgMail.setApiKey(process.env.SENDGRID_API_KEY)
    const msg = {
@@ -73,7 +108,7 @@ const sendEmail = (token,userEmail)=>{
     font-size: inherit !important;
     font-weight: inherit !important;
     line-height: inherit !important;
-    color: inherit !important;
+    color: white !important;
     text-decoration: none !important;
   }
 
@@ -99,7 +134,8 @@ const sendEmail = (token,userEmail)=>{
   }
 
   a {
-    color: #1a82e2;
+    color: white !important;
+    text-decoration:none;
   }
 
   img {
@@ -186,7 +222,7 @@ const sendEmail = (token,userEmail)=>{
           <!-- start copy -->
           <tr>
             <td align="left" bgcolor="#ffffff" style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
-              <p style="margin: 0;">Below is your security code, don't share it</p>
+              <p style="margin: 0;">Below is the link to comfirm you email.</p>
             </td>
           </tr>
           <!-- end copy -->
@@ -199,8 +235,8 @@ const sendEmail = (token,userEmail)=>{
                   <td align="center" bgcolor="#ffffff" style="padding: 0px;">
                     <table border="0" cellpadding="0" cellspacing="0">
                       <tr>
-                        <td align="center" bgcolor="#1a82e2" style="border-radius: 6px;">
-                          <p style="display: inline-block; padding: 5px 10px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; color: #ffffff; text-decoration: none; border-radius: 6px; font-size:20px; margin-block-start: 0px; margin-block-end: 0px;">${token}</p>
+                        <td align="center" bgcolor="#1a82e2" style="border-radius: 6px; padding:5px;">
+                          <a style="font-size:20px;" href="https://ivisary.sadikirungo.repl.co/verify/${saveToken.owner}/${saveToken._id}">Click here to verify your email</>
                         </td>
                       </tr>
                     </table>

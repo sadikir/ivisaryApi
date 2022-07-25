@@ -14,10 +14,9 @@ const ProfileSchema = new mongoose.Schema({
     type:String,
     required:false
   },
-  email:{
+  tempEmail:{
     type:String,
     required:true,
-    unique:true
   },
   passWord:{
     type:String,

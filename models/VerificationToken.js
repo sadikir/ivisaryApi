@@ -1,10 +1,10 @@
 const mongoose= require("mongoose");
-const User = require("../models/Profile.js")
+const PaidUser = require("../models/PaidUser.js")
 
 const verificationTokenSchema = new mongoose.Schema({
   owner:{
     type: mongoose.Schema.Types.ObjectId,
-    ref:User
+    ref:PaidUser
   },
   tokenCode:{
     type:String,

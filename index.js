@@ -21,7 +21,7 @@ let MongoUrl= process.env.MONGO_URL
 mongoose.connect(MongoUrl,{
    useNewUrlParser:true,
    useUnifiedTopology:true,
-  
+   autoIndex: true,
  }).then(console.log("db connection successfully.")).catch(err=>console.log(err))
 
 
@@ -42,7 +42,7 @@ const storage= multer.diskStorage({
 });
 const upload = multer({storage:storage});
 app.post("/api/upload", upload.single("file"), (req, res)=>{
-  console.log(req.body.name)
+  // console.log(req.body.name)
   res.status(200).json("file uploaded")
 })
 

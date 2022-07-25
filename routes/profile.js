@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const User = require("../models/Profile.js")
+const PaidUser = require("../models/PaidUser.js")
 const bcrypt=require("bcrypt");
 
 
@@ -10,31 +10,50 @@ router.use(function(req, res, next) {
 });
 
 router.put("/:id", async (req, res)=>{
+  let emailExist=""
   if(req.params.id===req.body.userId){
-    const validPass= await User.findById(req.params.id);
-    console.log(validPass)
-    // const salt = await bcrypt.genSalt(10);
-    // req.body.passWord = await bcrypt.hash(req.body.passWord, salt);
-    const validated= await bcrypt.compare(req.body.passWord,validPass.passWord)
-    console.log(validated);
-    if(validated){
-      try{
-       const salt = await bcrypt.genSalt(10);
-       req.body.newPass= await bcrypt.hash(req.body.newPass, salt)
-       const user =await User.findByIdAndUpdate(req.params.id,{
-         $set: {firstName:req.body.firstName, lastName:req.body.lastName,phone:req.body.phone, accountType:req.body.accountType,email:req.body.email,passWord:req.body.newPass}
+    try{
+      const user =await PaidUser.findById(req.params.id);
+
+      if(!user){
+        res.status(400).json("Wrong id!");
+        throw new Error("Wrong user Id")
+      }
+      
+      const validPass= await bcrypt.compare(req.body.oldPass,user.passWord)
+        console.log(validPass)
+      
+      if(!validPass){
+        res.status(400).json("Wrong password!");
+        throw new Error("wrong password")
+      }
+      if(user.email===req.body.email){
+        emailExist=true;
+        console.log("old email")
+      }else{
+        emailExist=false
+        console.log("new email")
+      }
+      const salt = await bcrypt.genSalt(10);
+      req.body.newPass = await bcrypt.hash(req.body.newPass, salt)
+      const updatedUser = await PaidUser.findByIdAndUpdate(req.params.id,{
+          $set: {firstName:req.body.firstName,
+                 lastName:req.body.lastName,
+                 phone:req.body.phone,
+                 address:req.body.address,
+                 isVerified:emailExist,
+                 email:req.body.email,
+                 passWord:req.body.newPass}
     },{new:true})
-    const {passWord, ...others} = user._doc;
-    res.status(200).json(others)
+      const {passWord, frontID, backID, sefliePhoto, incomeDoc, ...others} = updatedUser._doc                 
+      res.status(200).json(others)
+      
     }catch(err){
-      res.status(500).json(err)
       console.log(err)
-    }
-    }else{
-      res.status(500).json("Wrong credentials")
     }
   }else{
     res.status(401).json("You can only update your account")
+    console.log("invalid id")
   }
 })
 module.exports = router;
