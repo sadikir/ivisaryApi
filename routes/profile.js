@@ -21,7 +21,7 @@ router.put("/:id", async (req, res)=>{
       }
       
       const validPass= await bcrypt.compare(req.body.oldPass,user.passWord)
-        console.log(validPass)
+        
       
       if(!validPass){
         res.status(400).json("Wrong password!");
@@ -29,10 +29,10 @@ router.put("/:id", async (req, res)=>{
       }
       if(user.email===req.body.email){
         emailExist=true;
-        console.log("old email")
+        
       }else{
         emailExist=false
-        console.log("new email")
+        
       }
       const salt = await bcrypt.genSalt(10);
       req.body.newPass = await bcrypt.hash(req.body.newPass, salt)

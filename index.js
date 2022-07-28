@@ -2,7 +2,9 @@ const express=require('express')
 const path = require("path");
 const app = express();
 const mongoose = require("mongoose")
+const contactRoute = require("./contact.js")
 const authRoute = require("./routes/auth.js")
+const mailListRoute = require("./routes/maillist.js")
 const multer = require("multer")
 const profileRoute = require("./routes/profile")
 const paymentRoute = require("./routes/payment.js")
@@ -49,5 +51,7 @@ app.post("/api/upload", upload.single("file"), (req, res)=>{
 app.use("/api/auth", authRoute)
 app.use("/api/profile", profileRoute);
 app.use("/api/payment", paymentRoute);
+app.use("/api/mail", mailListRoute);
+app.use("/api/contact", contactRoute)
 
 

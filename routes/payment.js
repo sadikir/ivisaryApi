@@ -9,13 +9,22 @@ router.use(function(req, res, next) {
 });
 router.post("/payment_session", async (req, res)=>{
   const userId=req.body.registeredUser
+  
   try {
+//     const createCustomer = await stripe.customers.create({
+//       email: req.body.userEmail,
+//       payment_method: 'pm_card_visa',
+//       invoice_settings: {default_payment_method: 'pm_card_visa'},
+// });
     const session = await stripe.checkout.sessions.create({
+      // customer:createCustomer,
       payment_method_types: ["card"],
       mode: "subscription",
-      metadata:{
-          "order_id": req.body.registeredUser
-        },
+      // subscription_data:{
+      //    metadata:{
+      //     "order_id":userId
+      //   }
+      // },
       line_items:[{
         "quantity": req.body.units,
         //the fast sponsorship
@@ -28,12 +37,10 @@ router.post("/payment_session", async (req, res)=>{
       success_url: `https://ivisary.sadikirungo.repl.co/registeruser/${userId}`,
       cancel_url: `https://ivisary.sadikirungo.repl.co/about/#pricing`,
     })
-    // const invoice = await stripe.invoices.search({
-    //   query: `metadata[\"order_id\"]:\"+${req.body.registeredUser}\"`,
-    // });
     
-    res.json({url:session.url})
+    res.json({url:session.url, sessionId:session.id})
   } catch (err) {
+    console.log(err)
     res.status(500).json(err)
   }
   

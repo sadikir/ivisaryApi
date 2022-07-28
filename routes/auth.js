@@ -44,7 +44,7 @@ router.post("/register", async(req, res)=>{
     });
     //Generate a verification token and save it.
      const user = await NewUser.save()
-     res.status(200).json(user._id);
+     res.status(200).json({userId:user._id, email:req.body.email});
 
     
   }catch(err){
@@ -64,14 +64,12 @@ router.post("/paid", async(req, res)=>{
        const tempUser=await User.findById(req.body.userId)
        const permUser= await PaidUser.exists({tempOwner:tempUser._id})
     if(!permUser){
-
-           const invoice = await stripe.invoices.search({
-              query: `metadata[\"order_id\"]:\"${req.body.userId}\"`,
-             
-         });
-          console.log(invoice)
+          //get the customer id
+          const session = await stripe.checkout.sessions.retrieve(req.body.sessionId)
+      
           const permanentUser= new PaidUser({
           tempOwner:tempUser._id,
+          stripeCustomerId:session.customer,
           accountType:tempUser.accountType,
           firstName:tempUser.firstName,
           lastName:tempUser.lastName,
@@ -88,8 +86,28 @@ router.post("/paid", async(req, res)=>{
           relatives:tempUser.relatives
         });
         const saveNewUser= await permanentUser.save()
-      const {passWord, frontID, backID, selfiePhoto, incomeDoc, ...others} = saveNewUser._doc  
-        res.status(200).json(others)
+      //get the invoice to retrieve subscription
+        const invoice = await stripe.invoices.retrieveUpcoming({
+          customer: saveNewUser.stripeCustomerId,
+        });
+      //get subscription data
+        const subscription = await stripe.subscriptions.retrieve(
+  invoice.subscription
+);    
+      //convert the subscription into readable date
+        let datetime = subscription.current_period_end *1000; 
+        let date = new Date(datetime);
+        let options = {
+           year: 'numeric', month: 'numeric', day: 'numeric',
+        };
+        let nextBill = date.toLocaleDateString('en', options);
+      
+      console.log(nextBill)
+//       
+      const {passWord,stripeCustomerId, frontID, backID, selfiePhoto, incomeDoc, ...others} = saveNewUser._doc  
+        const data = {...others,nextBill}
+        
+        res.status(200).json(data)
         email.sendEmail(saveNewUser.email)
         await tempUser.delete()
 
@@ -113,8 +131,27 @@ router.post("/login", async (req, res)=>{
     !user && res.status(400).json("Wrong credential");
     const validated = bcrypt.compare(user.passWord, req.body.passWord);
     !validated && res.status(400).json("Wrong credential");
-    const { passWord, employer, frontID, backID, selfiePhoto, incomeDoc, income, ...others} = user._doc
-    res.status(200).json(others)
+    
+     const invoice = await stripe.invoices.retrieveUpcoming({
+          customer: user.stripeCustomerId,
+        });
+      //get subscription data
+        const subscription = await stripe.subscriptions.retrieve(
+  invoice.subscription
+);    
+      //convert the subscription into readable date
+        let datetime = subscription.current_period_end *1000; 
+        let date = new Date(datetime);
+        let options = {
+           year: 'numeric', month: 'numeric', day: 'numeric',
+        };
+        let nextBill = date.toLocaleDateString('en', options);
+      
+      console.log(nextBill)
+//       
+      const {passWord, stripeCustomerId, frontID, backID, selfiePhoto, incomeDoc, ...others} = user._doc  
+        const data = {...others,nextBill}
+        res.status(200).json(data)
   }catch(err){
     res.status(500).json(err)
     console.log(err)

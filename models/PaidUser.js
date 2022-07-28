@@ -6,6 +6,11 @@ const PaidUserSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref:User
   },
+  stripeCustomerId:{
+    type:String,
+    required:false
+  },
+  
   accountType:{
     type:String,
     required:false
