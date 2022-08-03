@@ -128,9 +128,17 @@ router.post("/paid", async(req, res)=>{
 router.post("/login", async (req, res)=>{
   try{
     const user = await PaidUser.findOne({email:req.body.email})
-    !user && res.status(400).json("Wrong credential");
-    const validated = bcrypt.compare(user.passWord, req.body.passWord);
-    !validated && res.status(400).json("Wrong credential");
+    if(!user){
+      res.status(400).json("Wrong email or password");
+      throw new Error("wrong email")
+    } 
+    const validated = await bcrypt.compare( req.body.passWord, user.passWord);
+    console.log(validated)
+    
+    if(!validated){
+      res.status(400).json("Wrong email or password");
+      throw new Error("wrong Password")
+    } 
     
      const invoice = await stripe.invoices.retrieveUpcoming({
           customer: user.stripeCustomerId,
@@ -153,7 +161,6 @@ router.post("/login", async (req, res)=>{
         const data = {...others,nextBill}
         res.status(200).json(data)
   }catch(err){
-    res.status(500).json(err)
     console.log(err)
   }
 })
