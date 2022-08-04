@@ -102,7 +102,7 @@ router.post("/paid", async(req, res)=>{
         };
         let nextBill = date.toLocaleDateString('en', options);
       
-      console.log(nextBill)
+      
 //       
       const {passWord,stripeCustomerId, frontID, backID, selfiePhoto, incomeDoc, ...others} = saveNewUser._doc  
         const data = {...others,nextBill}
