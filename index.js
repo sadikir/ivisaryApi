@@ -47,7 +47,9 @@ app.post("/api/upload", upload.single("file"), (req, res)=>{
   // console.log(req.body.name)
   res.status(200).json("file uploaded")
 })
-
+app.get("/", (req,res)=>{
+res.render("No access")
+})
 app.use("/api/auth", authRoute)
 app.use("/api/profile", profileRoute);
 app.use("/api/payment", paymentRoute);
