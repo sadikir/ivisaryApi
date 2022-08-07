@@ -7,10 +7,17 @@ const email = require("../email.js")
 const axios = require ("axios")
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY)
 
-router.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "https://ivisary.sadikirungo.repl.co"); // update to match the domain you will make the request from
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
+router.use((req, res, next) => {
+  const allowedOrigins = ['https://ivisary.sadikirungo.repl.co', 'https://ivisary.com'];
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+       res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  //res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:8020');
+  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', true);
+  return next();
 });
 
 //Initial userdata storing
@@ -175,9 +182,17 @@ router.put("/verify/:id", async (req,res)=>{
       const getToken = await Token.findOne({owner:req.body.userId});
       if(getToken.id===req.body.tokenId){
         console.log("user and token match")
-        const updateUser = await PaidUser.findByIdAndUpdate(req.params.id,{
+        const user = await PaidUser.findOne({_id:req.body.userId})
+        if(user.isVerified){
+          const updateUser = await PaidUser.findByIdAndUpdate(req.params.id,{
           $set:{isVerified:true}
         },{new:true})
+        }else{
+          const updateUser = await PaidUser.findByIdAndUpdate(req.params.id,{
+          $set:{isVerified:false}
+        },{new:true})
+        }
+        
         //getToken.delete()
         const {passWord, frontID, backID, selfiePhoto, incomeDoc, ...others} = updateUser._doc  
         console.log(updateUser)

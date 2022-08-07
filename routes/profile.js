@@ -3,14 +3,21 @@ const PaidUser = require("../models/PaidUser.js")
 const bcrypt=require("bcrypt");
 
 
-router.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "https://ivisary.sadikirungo.repl.co"); // update to match the domain you will make the request from
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
+router.use((req, res, next) => {
+  const allowedOrigins = ['https://ivisary.sadikirungo.repl.co', 'https://ivisary.com'];
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+       res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  //res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:8020');
+  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', true);
+  return next();
 });
 
 router.put("/:id", async (req, res)=>{
-  let emailExist=""
+  let verify=""
   if(req.params.id===req.body.userId){
     try{
       const user =await PaidUser.findById(req.params.id);
@@ -27,13 +34,14 @@ router.put("/:id", async (req, res)=>{
         res.status(400).json("Wrong password!");
         throw new Error("wrong password")
       }
-      if(user.email===req.body.email){
-        emailExist=true;
+      if(user.email===req.body.email && user.isVerified===true){
+        verify=true;
         
       }else{
-        emailExist=false
+        verify=false
         
       }
+      console.log(verify)
       const salt = await bcrypt.genSalt(10);
       req.body.newPass = await bcrypt.hash(req.body.newPass, salt)
       const updatedUser = await PaidUser.findByIdAndUpdate(req.params.id,{
@@ -41,7 +49,7 @@ router.put("/:id", async (req, res)=>{
                  lastName:req.body.lastName,
                  phone:req.body.phone,
                  address:req.body.address,
-                 isVerified:emailExist,
+                 isVerified:verification,
                  email:req.body.email,
                  passWord:req.body.newPass}
     },{new:true})
