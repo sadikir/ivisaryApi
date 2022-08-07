@@ -12,7 +12,6 @@ const cors = require("cors")
 app.use("/files", express.static(path.join(__dirname, "/files")));
 app.use(cors({origin: true, credentials: true}));
 app.use(express.json())
-let PORT=process.env.PORT | 3000;
 let MongoUrl= process.env.MONGO_URL
 
 
@@ -27,7 +26,7 @@ mongoose.connect(MongoUrl,{
  }).then(console.log("db connection successfully.")).catch(err=>console.log(err))
 
 
-app.listen(PORT, ()=>{
+app.listen(process.env.PORT || 3000, ()=>{
 console.log("backend is running")
 })
 
