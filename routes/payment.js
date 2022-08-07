@@ -2,10 +2,17 @@ const router = require("express").Router();
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY)
 
 
-router.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "https://ivisary.sadikirungo.repl.co"); // update to match the domain you will make the request from
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
+router.use((req, res, next) => {
+  const allowedOrigins = ['https://ivisary.sadikirungo.repl.co', 'https://ivisary.com'];
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+       res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  //res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:8020');
+  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', true);
+  return next();
 });
 router.post("/payment_session", async (req, res)=>{
   const userId=req.body.registeredUser
