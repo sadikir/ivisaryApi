@@ -16,8 +16,9 @@ router.use((req, res, next) => {
 });
 router.post("/payment_session", async (req, res)=>{
   const userId=req.body.registeredUser
+  
   const host = req.get('host')
-  let url;
+  let url="";
   if(host==="ivisary.com"){
     url = "https://ivisary.com"
   }else if(host === "ivisary.sadikirungo.repl.co"){
