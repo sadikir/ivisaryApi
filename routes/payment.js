@@ -17,13 +17,16 @@ router.use((req, res, next) => {
 router.post("/payment_session", async (req, res)=>{
   const userId=req.body.registeredUser
   
-  const host = req.get('host')
+  const origin = req.get('origin')
+  console.log(origin)
+ 
   let url="";
-  if(host==="ivisary.com"){
+  if(origin==="https://ivisary.com"){
     url = "https://ivisary.com"
-  }else if(host === "ivisary.sadikirungo.repl.co"){
+  }else if(origin === "https://ivisary.sadikirungo.repl.co"){
     url = "https://ivisary.sadikirungo.repl.co"
   }
+  console.log(url)
   try {
 //     const createCustomer = await stripe.customers.create({
 //       email: req.body.userEmail,
