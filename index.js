@@ -30,7 +30,9 @@ app.listen(process.env.PORT || 3000, ()=>{
 console.log("backend is running")
 })
 
-
+app.get('/', (req, res)=>{
+ res.send("No access")
+})
 
 const storage= multer.diskStorage({
   destination:(req, file, cb)=>{

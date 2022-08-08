@@ -49,7 +49,7 @@ router.put("/:id", async (req, res)=>{
                  lastName:req.body.lastName,
                  phone:req.body.phone,
                  address:req.body.address,
-                 isVerified:verification,
+                 isVerified:verify,
                  email:req.body.email,
                  passWord:req.body.newPass}
     },{new:true})

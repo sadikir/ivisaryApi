@@ -16,7 +16,13 @@ router.use((req, res, next) => {
 });
 router.post("/payment_session", async (req, res)=>{
   const userId=req.body.registeredUser
-  
+  const host = req.get('host')
+  let url;
+  if(host==="ivisary.com"){
+    url = "https://ivisary.com"
+  }else if(host === "ivisary.sadikirungo.repl.co"){
+    url = "https://ivisary.sadikirungo.repl.co"
+  }
   try {
 //     const createCustomer = await stripe.customers.create({
 //       email: req.body.userEmail,
@@ -41,8 +47,8 @@ router.post("/payment_session", async (req, res)=>{
              :null,
       },
      ],
-      success_url: `https://ivisary.sadikirungo.repl.co/registeruser/${userId}`,
-      cancel_url: `https://ivisary.sadikirungo.repl.co/about/#pricing`,
+      success_url: `${url}/${userId}`,
+      cancel_url: `${url}/about/#pricing`,
     })
     
     res.json({url:session.url, sessionId:session.id})
