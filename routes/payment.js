@@ -51,7 +51,7 @@ router.post("/payment_session", async (req, res)=>{
              :null,
       },
      ],
-      success_url: `${url}/${userId}`,
+      success_url: `${url}/registeruser/${userId}`,
       cancel_url: `${url}/about/#pricing`,
     })
     
