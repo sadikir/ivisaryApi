@@ -4,6 +4,7 @@
 const PaidUser = require("./models/PaidUser.js")
 const bcrypt = require("bcrypt")
 const Token = require("./models/VerificationToken.js")
+const axios = require("axios")
 
 
 const sendEmail = async(userEmail)=>{
@@ -25,14 +26,21 @@ let OTP ="";
     
     //create and save a new token
      const User=await PaidUser.findOne({email:userEmail})
-    const createTokenDoc = new Token({
+     //console.log(User._id.toString())
+    const userId= User._id.toString()
+    const oldToken= await Token.exists({owner: userId})
+  
+      const createTokenDoc = new Token({
       owner:User._id,
       tokenCode:hashedToken
     })
+      const saveToken = await createTokenDoc.save();
+    
+    
     //send the token email to the user
     
     //save both the user and the token
-    const saveToken = await createTokenDoc.save();
+    
     
 
 

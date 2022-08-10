@@ -172,45 +172,95 @@ router.post("/login", async (req, res)=>{
   }
 })
 router.put("/verify/:id", async (req,res)=>{
-
+console.log("hit")
+  try{
   const checkToken = await Token.exists({_id:req.body.tokenId})
   const checkUser = await PaidUser.exists({_id:req.body.userId})
+   
   if(checkToken){
-    
-    
-    if(checkUser){
-      const getToken = await Token.findOne({owner:req.body.userId});
-      if(getToken.id===req.body.tokenId){
-        console.log("user and token match")
-        const user = await PaidUser.findOne({_id:req.body.userId})
-        if(user.isVerified){
-          const updateUser = await PaidUser.findByIdAndUpdate(req.params.id,{
+    const getToken = await Token.findOne({_id:req.body.tokenId})
+    const tokenUserId=getToken.owner.toString()
+    console.log(tokenUserId)
+    if(tokenUserId===req.body.userId){
+      console.log("token and user match")
+      const updateUser = await PaidUser.findByIdAndUpdate(req.params.id,{
           $set:{isVerified:true}
         },{new:true})
-        }else{
-          const updateUser = await PaidUser.findByIdAndUpdate(req.params.id,{
-          $set:{isVerified:false}
-        },{new:true})
-        }
-        
-        //getToken.delete()
-        const {passWord, frontID, backID, selfiePhoto, incomeDoc, ...others} = updateUser._doc  
-        console.log(updateUser)
-        res.status(200).json(others)
-        //request to delete the token
-        await axios.delete(`https://api.sadikirungo.repl.co/api/auth/token/${getToken.id}`,{
-          owner:req.body.userId
+      //get the invoice to retrieve subscription
+        const invoice = await stripe.invoices.retrieveUpcoming({
+          customer: updateUser.stripeCustomerId,
         });
+      //get subscription data
+        const subscription = await stripe.subscriptions.retrieve(
+  invoice.subscription
+);    
+      //convert the subscription into readable date
+        let datetime = subscription.current_period_end *1000; 
+        let date = new Date(datetime);
+        let options = {
+           year: 'numeric', month: 'numeric', day: 'numeric',
+        };
+        let nextBill = date.toLocaleDateString('en', options);
+      
+      
+//       
+      const {passWord,stripeCustomerId, frontID, backID, selfiePhoto, incomeDoc, ...others} = updateUser._doc  
+        const data = {...others,nextBill}
         
-      }else{
-        res.status(400).json("Token and user don't match")
-      }
+        res.status(200).json(data)
+
+            //request to delete the token
+        await axios.delete(`https://api.sadikirungo.repl.co/api/auth/token/${getToken.id}`,{
+          
+        });
+      
     }else{
-      res.status(400).json("User not found. Create account")
+      res.status(500).json("Token and user don't match")
+      console.log("token and user don't match")
     }
   }else{
-    res.status(400).json("Token not found or expired.")
+    res.status(500).json("Token doesn't exist or expired")
+    console.log("token expired")
   }
+  }catch(err){
+    console.log(err)
+  }
+    
+    
+    
+      
+  //     if(getToken._id===req.body.tokenId){
+  //       console.log("user and token match")
+  //       const user = await PaidUser.findOne({_id:req.body.userId})
+  //       if(user.isVerified){
+  //         const updateUser = await PaidUser.findByIdAndUpdate(req.params.id,{
+  //         $set:{isVerified:true}
+  //       },{new:true})
+  //       }else{
+  //         const updateUser = await PaidUser.findByIdAndUpdate(req.params.id,{
+  //         $set:{isVerified:false}
+  //       },{new:true})
+  //       }
+        
+  //       //getToken.delete()
+  //       const {passWord, frontID, backID, selfiePhoto, incomeDoc, ...others} = updateUser._doc  
+  //       console.log(updateUser)
+  //       res.status(200).json(others)
+        
+  
+        
+  //     }else{
+  //       res.status(400).json("Token and user don't match")
+  //     }
+  //   }else{
+  //     res.status(400).json("User not found. Create account")
+  //   }
+  // }else{
+  //   res.status(400).json("Token not found or expired.")
+  // }
+  // }catch(err){
+  //   console.log(err)
+  // }
   
 })
 router.delete("/token/:id", async (req,res)=>{
