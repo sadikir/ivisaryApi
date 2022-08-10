@@ -244,7 +244,7 @@ let OTP ="";
                     <table border="0" cellpadding="0" cellspacing="0">
                       <tr>
                         <td align="center" bgcolor="#1a82e2" style="border-radius: 6px; padding:5px;">
-                          <a style="font-size:20px;" href="https://ivisary.sadikirungo.repl.co/verify/${saveToken.owner}/${saveToken._id}">Click here to verify your email</>
+                          <a style="font-size:20px;" href="https://ivisary.com/verify/${saveToken.owner}/${saveToken._id}">Click here to verify your email</>
                         </td>
                       </tr>
                     </table>
