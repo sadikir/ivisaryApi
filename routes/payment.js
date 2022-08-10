@@ -45,9 +45,9 @@ router.post("/payment_session", async (req, res)=>{
       line_items:[{
         "quantity": req.body.units,
         //the fast sponsorship
-        price:req.body.productId==="prod_M5xfYmoZeiVTIE"?req.body.priceId
+        price:req.body.productId==="prod_MDqBq2IHtY1xfY"?req.body.priceId
           //Basic sponsorship
-             :req.body.productId==="prod_M5xdf3OGHRLnAe"?req.body.priceId
+             :req.body.productId==="prod_MDqB85y9xR85fj"?req.body.priceId
              :null,
       },
      ],
